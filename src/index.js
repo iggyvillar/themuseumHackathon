@@ -1,16 +1,19 @@
 // index.js
 const express = require("express");
-const app = express();
-const PORT = process.env.PORT || 3000;
+const dotenv = require("dotenv");
+const { connectDB } = require("./config/mongodbConfig");
+const { router } = require("./routers");
 
-// built-in middleware: parse JSON body
-app.use(express.json());
+(async () => {
+  dotenv.config();
+  await connectDB();
 
-// simple route
-app.get("/", (req, res) => {
-  res.send("Hello from Express 👋");
-});
+  const app = express();
+  app.use(express.json());
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+  app.use("/api", router);
+
+  app.listen(process.env.PORT, () => {
+    console.log(`Server running at http://localhost:${process.env.PORT}`);
+  });
+})();
