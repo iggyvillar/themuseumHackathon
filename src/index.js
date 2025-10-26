@@ -1,4 +1,5 @@
 // index.js
+require("dotenv").config(); // load .env BEFORE requiring clickup.js
 const express = require("express");
 const dotenv = require("dotenv");
 const { connectDB } = require("./config/mongodbConfig");

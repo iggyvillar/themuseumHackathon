@@ -1,9 +1,8 @@
 const express = require("express");
-const basicRoutes = require("./basicRoutes");
+const clickupRoutes = require("./clickUpRoute");
 
 const router = express.Router();
 
-// Mount basic routes
-router.use("/", basicRoutes);
+router.use("/clickup", clickupRoutes);
 
 module.exports = { router };
