@@ -1,3 +1,5 @@
+# .Env file values
+
 MONGO_URI=mongodb+srv://username:password@cluster0.mongodb.net/myDatabase
 PORT=5000
 CLICKUP_TOKEN=pk_dummytoken_1234567890abcdef
