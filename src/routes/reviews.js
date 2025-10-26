@@ -7,8 +7,64 @@ const GooglePlacesService = require('../services/googlePlacesService');
 const googlePlacesService = new GooglePlacesService(process.env.GOOGLE_PLACES_API_KEY);
 
 /**
- * GET /api/reviews
- * Get all reviews from database with optional filtering
+ * @swagger
+ * /api/reviews:
+ *   get:
+ *     summary: Get all reviews from database
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: query
+ *         name: placeId
+ *         schema:
+ *           type: string
+ *         description: Filter by place ID
+ *       - in: query
+ *         name: source
+ *         schema:
+ *           type: string
+ *           enum: [maps, sheets, other]
+ *         description: Filter by source
+ *       - in: query
+ *         name: state
+ *         schema:
+ *           type: string
+ *           enum: [unfiltered, filtered, processed]
+ *         description: Filter by state
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *         description: Number of results
+ *       - in: query
+ *         name: skip
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *         description: Number to skip
+ *     responses:
+ *       200:
+ *         description: List of reviews
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     reviews:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Review'
+ *                     total:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     skip:
+ *                       type: integer
  */
 router.get('/', async (req, res) => {
   try {
@@ -115,9 +171,57 @@ async function fetchAndSaveReviews(placeId) {
 }
 
 /**
- * POST /api/reviews/fetch
- * Fetch reviews from Google Places API and save them to database
- * Accepts placeId in body, query parameter, or uses default from .env
+ * @swagger
+ * /api/reviews/fetch:
+ *   post:
+ *     summary: Fetch reviews from Google Places API
+ *     tags: [Reviews]
+ *     description: Fetch reviews from Google Places and save to database with source=maps and state=unfiltered
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               placeId:
+ *                 type: string
+ *                 description: Google Place ID (optional if DEFAULT_PLACE_ID is set in .env)
+ *                 example: ChIJ52t8jPL0K4gRX8TcXqzfMJQ
+ *     parameters:
+ *       - in: query
+ *         name: placeId
+ *         schema:
+ *           type: string
+ *         description: Google Place ID as query parameter
+ *     responses:
+ *       200:
+ *         description: Reviews fetched and saved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     totalFetched:
+ *                       type: integer
+ *                     totalSaved:
+ *                       type: integer
+ *                     totalSkipped:
+ *                       type: integer
+ *                     savedReviews:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Review'
+ *       400:
+ *         description: Bad request
+ *       404:
+ *         description: No reviews found
  */
 router.post('/fetch', async (req, res) => {
   try {
@@ -155,9 +259,21 @@ router.post('/fetch', async (req, res) => {
 });
 
 /**
- * GET /api/reviews/fetch
- * Alternative GET endpoint for fetching reviews (easier testing)
- * Uses placeId from query parameter or default from .env
+ * @swagger
+ * /api/reviews/fetch:
+ *   get:
+ *     summary: Fetch reviews from Google Places API (GET method)
+ *     tags: [Reviews]
+ *     description: Alternative GET endpoint for fetching reviews (easier browser testing)
+ *     parameters:
+ *       - in: query
+ *         name: placeId
+ *         schema:
+ *           type: string
+ *         description: Google Place ID (optional if DEFAULT_PLACE_ID is set in .env)
+ *     responses:
+ *       200:
+ *         description: Reviews fetched and saved successfully
  */
 router.get('/fetch', async (req, res) => {
   try {
@@ -193,8 +309,32 @@ router.get('/fetch', async (req, res) => {
 });
 
 /**
- * GET /api/reviews/:id
- * Get a specific review by ID
+ * @swagger
+ * /api/reviews/{id}:
+ *   get:
+ *     summary: Get a specific review by ID
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Review ID
+ *     responses:
+ *       200:
+ *         description: Review details
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/Review'
+ *       404:
+ *         description: Review not found
  */
 router.get('/:id', async (req, res) => {
   try {
@@ -223,8 +363,34 @@ router.get('/:id', async (req, res) => {
 });
 
 /**
- * PUT /api/reviews/:id
- * Update a specific review
+ * @swagger
+ * /api/reviews/{id}:
+ *   put:
+ *     summary: Update a specific review
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Review ID
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               state:
+ *                 type: string
+ *                 enum: [unfiltered, filtered, processed]
+ *               text:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Review updated successfully
+ *       404:
+ *         description: Review not found
  */
 router.put('/:id', async (req, res) => {
   try {
@@ -263,8 +429,23 @@ router.put('/:id', async (req, res) => {
 });
 
 /**
- * DELETE /api/reviews/:id
- * Delete a specific review
+ * @swagger
+ * /api/reviews/{id}:
+ *   delete:
+ *     summary: Delete a specific review
+ *     tags: [Reviews]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Review ID
+ *     responses:
+ *       200:
+ *         description: Review deleted successfully
+ *       404:
+ *         description: Review not found
  */
 router.delete('/:id', async (req, res) => {
   try {

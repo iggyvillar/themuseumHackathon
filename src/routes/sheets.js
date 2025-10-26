@@ -81,9 +81,51 @@ async function fetchAndSaveSheetReviews(range, columnMapping = {}) {
 }
 
 /**
- * POST /api/sheets/fetch
- * Fetch reviews from Google Sheets and save them to database
- * Accepts range and columnMapping in body or query parameters
+ * @swagger
+ * /api/sheets/fetch:
+ *   post:
+ *     summary: Fetch reviews from Google Sheets
+ *     tags: [Sheets]
+ *     description: Fetch reviews from Google Sheets/Forms and save to database with source=sheets and state=unfiltered
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               range:
+ *                 type: string
+ *                 description: Sheet range to fetch
+ *                 example: "Form Responses 1!A2:Z"
+ *               columnMapping:
+ *                 type: object
+ *                 description: Map column indices to field names
+ *                 example: {"timestamp": 0, "name": 1, "rating": 3, "text": 4}
+ *     responses:
+ *       200:
+ *         description: Reviews fetched and saved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     totalFetched:
+ *                       type: integer
+ *                     totalSaved:
+ *                       type: integer
+ *                     totalSkipped:
+ *                       type: integer
+ *       400:
+ *         description: Bad request
+ *       404:
+ *         description: No data found
  */
 router.post('/fetch', async (req, res) => {
   try {
@@ -119,9 +161,28 @@ router.post('/fetch', async (req, res) => {
 });
 
 /**
- * GET /api/sheets/fetch
- * Alternative GET endpoint for fetching sheet reviews (easier testing)
- * Accepts range and columnMapping as query parameters
+ * @swagger
+ * /api/sheets/fetch:
+ *   get:
+ *     summary: Fetch reviews from Google Sheets (GET method)
+ *     tags: [Sheets]
+ *     description: Alternative GET endpoint for fetching sheet reviews (easier browser testing)
+ *     parameters:
+ *       - in: query
+ *         name: range
+ *         schema:
+ *           type: string
+ *         description: Sheet range to fetch
+ *         example: "Form Responses 1!A2:Z"
+ *       - in: query
+ *         name: columnMapping
+ *         schema:
+ *           type: string
+ *         description: JSON string of column mapping
+ *         example: '{"timestamp":0,"name":1,"rating":3,"text":4}'
+ *     responses:
+ *       200:
+ *         description: Reviews fetched and saved successfully
  */
 router.get('/fetch', async (req, res) => {
   try {
@@ -170,8 +231,31 @@ router.get('/fetch', async (req, res) => {
 });
 
 /**
- * GET /api/sheets/metadata
- * Get Google Sheet metadata (title, sheets info)
+ * @swagger
+ * /api/sheets/metadata:
+ *   get:
+ *     summary: Get Google Sheet metadata
+ *     tags: [Sheets]
+ *     description: Get information about the Google Sheet (title, sheets, dimensions)
+ *     responses:
+ *       200:
+ *         description: Sheet metadata
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     title:
+ *                       type: string
+ *                     sheets:
+ *                       type: array
+ *       400:
+ *         description: Sheet ID not configured
  */
 router.get('/metadata', async (req, res) => {
   try {
@@ -200,8 +284,43 @@ router.get('/metadata', async (req, res) => {
 });
 
 /**
- * GET /api/sheets/preview
- * Preview sheet data without saving to database
+ * @swagger
+ * /api/sheets/preview:
+ *   get:
+ *     summary: Preview sheet data without saving
+ *     tags: [Sheets]
+ *     description: Preview raw sheet data without saving to database
+ *     parameters:
+ *       - in: query
+ *         name: range
+ *         schema:
+ *           type: string
+ *         description: Sheet range to preview
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 5
+ *         description: Number of rows to preview
+ *     responses:
+ *       200:
+ *         description: Preview data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     totalRows:
+ *                       type: integer
+ *                     previewRows:
+ *                       type: array
+ *                     range:
+ *                       type: string
  */
 router.get('/preview', async (req, res) => {
   try {
@@ -241,8 +360,44 @@ router.get('/preview', async (req, res) => {
 });
 
 /**
- * GET /api/sheets/reviews
- * Get all sheet reviews from database with optional filtering
+ * @swagger
+ * /api/sheets/reviews:
+ *   get:
+ *     summary: Get all sheet reviews from database
+ *     tags: [Sheets]
+ *     description: Get all reviews with source=sheets from database
+ *     parameters:
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 50
+ *         description: Number of results
+ *       - in: query
+ *         name: skip
+ *         schema:
+ *           type: integer
+ *           default: 0
+ *         description: Number to skip
+ *     responses:
+ *       200:
+ *         description: List of sheet reviews
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     reviews:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/Review'
+ *                     total:
+ *                       type: integer
  */
 router.get('/reviews', async (req, res) => {
   try {
