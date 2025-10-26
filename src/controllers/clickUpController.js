@@ -21,7 +21,7 @@ const getWhoAmI = async (_req, res) => {
 /** List Spaces in a team (pass ?teamId=... or set CLICKUP_TEAM_ID in .env) */
 const getSpaces = async (req, res) => {
   try {
-    const teamId = req.query.teamId || process.env.CLICKUP_TEAM_ID;
+    const teamId = req.params.teamId || process.env.CLICKUP_TEAM_ID;
     if (!teamId) return res.status(400).json({ error: "Provide teamId query or set CLICKUP_TEAM_ID" });
     const data = await getSpacesService(teamId);
     res.json(data);
@@ -67,7 +67,7 @@ const getFolderLists = async (req, res) => {
 /** Create a task */
 const createTask = async (req, res) => {
   try {
-    const listId = req.query.listId || process.env.CLICKUP_LIST_ID;
+    const listId = req.params.listId || process.env.CLICKUP_LIST_ID;
     if (!listId) return res.status(400).json({ error: "Provide listId query or set CLICKUP_LIST_ID" });
 
     const payload = {
