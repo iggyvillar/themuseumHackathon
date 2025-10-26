@@ -120,7 +120,8 @@ router.get('/health', (req, res) => {
         services: {
             googlePlaces: process.env.GOOGLE_PLACES_API_KEY ? "Configured" : "Not configured",
             googleSheets: process.env.GOOGLE_SHEET_ID ? "Configured" : "Not configured",
-            clickup: process.env.CLICKUP_API_KEY ? "Configured" : "Not configured"
+            clickup: process.env.CLICKUP_API_KEY ? "Configured" : "Not configured",
+            openai: process.env.OPENAI_API_KEY ? "Configured" : "Not configured"
         }
     });
 });

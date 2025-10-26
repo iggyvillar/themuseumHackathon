@@ -168,12 +168,14 @@ router.post('/', async (req, res) => {
  */
 router.get('/', async (req, res) => {
   try {
-    const { status, reviewId, limit = 50, skip = 0 } = req.query;
+    const { status, reviewId, department, priority, limit = 50, skip = 0 } = req.query;
 
     // Build filter
     const filter = {};
     if (status) filter.status = status;
     if (reviewId) filter.reviewId = reviewId;
+    if (department) filter.department = department;
+    if (priority) filter.priority = priority;
 
     const tasks = await Task.find(filter)
       .populate('reviewId', 'author_name placeName rating text source')
@@ -367,7 +369,7 @@ router.post('/:id/send', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
   try {
-    const { title, description, priority, status, assignee, dueDate, tags } = req.body;
+    const { title, description, priority, status, assignee, department, dueDate, tags } = req.body;
 
     const task = await Task.findById(req.params.id);
 
@@ -384,6 +386,7 @@ router.put('/:id', async (req, res) => {
     if (priority) task.priority = priority;
     if (status) task.status = status;
     if (assignee) task.assignee = assignee;
+    if (department) task.department = department;
     if (dueDate) task.dueDate = dueDate;
     if (tags) task.tags = tags;
 

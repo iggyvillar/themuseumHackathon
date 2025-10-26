@@ -22,12 +22,14 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 const reviewsRouter = require("./routes/reviews");
 const sheetsRouter = require("./routes/sheets");
 const tasksRouter = require("./routes/tasks");
+const aiRouter = require("./routes/ai");
 const healthRouter = require("./routes/health");
 
 // Use routes
 app.use("/api/reviews", reviewsRouter);
 app.use("/api/sheets", sheetsRouter);
 app.use("/api/tasks", tasksRouter);
+app.use("/api/ai", aiRouter);
 app.use("/", healthRouter);
 
 // Error handling middleware

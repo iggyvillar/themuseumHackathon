@@ -31,6 +31,10 @@ const options = {
         description: 'Task management and ClickUp integration',
       },
       {
+        name: 'AI',
+        description: 'AI-powered review analysis and task generation with OpenAI',
+      },
+      {
         name: 'Health',
         description: 'Health check endpoints',
       },
@@ -112,6 +116,31 @@ const options = {
             priority: {
               type: 'string',
               enum: ['low', 'medium', 'high', 'urgent'],
+            },
+            department: {
+              type: 'string',
+              description: 'Assigned department',
+              enum: [
+                'Finance & Administration',
+                'Exhibitions',
+                'Facilities/Custodial',
+                'Marketing',
+                'Programming',
+                'Programming - Adult Programming',
+                'Programming - Camps',
+                'Programming - Education',
+                'Programming - THEMUSEUM Special Events',
+                'Programming - The Underground Studio MakerSpace',
+                'Special Events',
+                'Development',
+                'THESTORE',
+                'Guest Services',
+                'Sales',
+                'Sales - Third-Party Rentals',
+                'Sales - Group Sales',
+                'Sales - Weddings',
+                'Sales - Corporate Rentals'
+              ]
             },
             status: {
               type: 'string',
